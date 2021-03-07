@@ -10,7 +10,6 @@
 using LinearAlgebra
 
 
-
 function GramSchmidt(A)
 # performs a QR factorization of matrix A using the Gram-Schmidt algorithm
 
@@ -20,14 +19,14 @@ function GramSchmidt(A)
     R = zeros(rows, cols)
 
     for i = 1:cols
-        tmp = A[1:rows, i]
+        tmp = A[1:rows, i:i]
         for j = 1:(i - 1)
-            R[j, i] = transpose(Q[1:rows, j]) * A[1:rows, i]
-            tmp -= R[j, i] * Q[1:rows, j]
+            R[j:j, i:i] = transpose(Q[1:rows, j:j]) * A[1:rows, i:i]
+            tmp -= R[j:j, i:i] * Q[1:rows, j:j]
         end
 
-        R[i, i] = VectorTwoNorm(tmp)
-        Q[1:rows, i] = tmp / R[i,i]
+        R[i:i, i:i] = VectorTwoNorm(tmp)
+        Q[1:rows, i:i] = tmp / R[i:i, i:i]
     end
 
     return Q, R
@@ -46,12 +45,12 @@ function ModifiedGramSchmidt(A)
 
     for i = 1:cols
         for j = 1:(i - 1)
-            R[j, i] = transpose(M[1:rows, j]) * M[1:rows, i]
-            M[1:rows, i] -= R[j, i] * M[1:rows, j]
+            R[j:j, i:i] = transpose(M[1:rows, j:j]) * M[1:rows, i:i]
+            M[1:rows, i:i] -= R[j:j, i:i] * M[1:rows, j:j]
         end
 
-        R[i, i] = VectorTwoNorm(M[1:rows, i])
-        M[1:rows, i] = M[1:rows, i] / R[i,i]
+        R[i:i, i:i] = VectorTwoNorm(M[1:rows, i:i])
+        M[1:rows, i:i] = M[1:rows, i:i] / R[i:i, i:i]
     end
 
     return M, R
@@ -70,7 +69,7 @@ function HouseHolderQr(A)
 
     # calculate the Householder matrices and update the R matrix
     for i = 1:cols
-        H = HouseholderMatrix(R[i:rows, i])
+        H = HouseholderMatrix(R[i:rows, i:i])
         Householders[i] = H
         R[i:rows, i:cols] = H * R[i:rows, i:cols]
     end
@@ -135,7 +134,7 @@ end
 function StandardBasisVector(dim, i)
 # returns the i-th standard basis vector of size (dim)
 
-    return Matrix(I, dim, dim)[i, 1:dim]
+    return Matrix(I, dim, dim)[i:i, 1:dim]
 end
 
 
