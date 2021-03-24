@@ -1,9 +1,9 @@
-# The code in this file performs a LU factorization of a real-valued matrix.
-#
-# At the end of the file is code that runs the factorizations and checks the accuracy
+# The code in this file performs a LU factorization of a real-valued matrix using
+# several different algorithms
+
+module LuFactorization
 
 using LinearAlgebra
-
 
 function LuGaussianElimination(A)
 # this function performs an LU factorization on matrix A using Gaussian elimination
@@ -65,7 +65,7 @@ function LuGaussTransforms(A)
     Gausses = Array{Matrix{Float64}}(undef, cols)
 
     for i = 1:(rows - 1)
-        Gausses[i] = GaussTransform(A, i)
+        Gausses[i] = GaussTransform(M, i)
         M = Gausses[i] * M
     end
 
@@ -120,14 +120,10 @@ function LuGaussTransformsWithPivots(A)
         Pivots[i] = Matrix{Float64}(I, rows, cols)
         Pivots[i][i:rows, i:cols] = ElementaryPivotMatrix(PivotRow, rows - i + 1, cols - i + 1)
 
-        # perform the pivot by applying the pivot matrix
-        #M[i:i, 1:i-1], M[PivotRow:PivotRow, 1:i-1] = M[PivotRow:PivotRow, 1:i-1], M[i:i, 1:i-1]
-        #M = Pivots[i] * M
+        # perform the pivot by applying the pivot matrix, but no need to actually use the matrix
+        # transform, we can just swap instead because that's what we know the transformation would
+        # do
         M[i:i, 1:cols], M[PivotRow+i-1:PivotRow+i-1, 1:cols] = M[PivotRow+i-1:PivotRow+i-1, 1:cols], M[i:i, 1:cols]
-        Gausses[] # we gotta swap these...probably easier not to use Gauss transforms but to use Gauss elim multipliers
-
-        println("\n", i, " ", PivotRow)
-        display(M)
 
         # now proceed as usual with our pivoted matrix by getting the Gauss
         # transform and using it to perform Gaussian elimination
@@ -211,7 +207,7 @@ function LuBordered(A)
 end
 
 
-function totalPermute(P)
+function totalPermute(p)
     Ps = Matrix{Float64}(I, size(p)[1], size(p)[1])
     for i = 1:size(p)[1]
         Ps = P[i] * Ps
@@ -220,31 +216,4 @@ function totalPermute(P)
     return Ps
 end
 
-# Let's test out this code that we wrote
-A = Matrix(rand(8,8))
-
-println("\n\n***********************")
-println("A")
-println("***********************")
-display(A)
-
-
- l, u, p = LuGaussianEliminationWithPivots(A)
-
-println("\n\n***********************")
-println("L")
-println("***********************")
-display(l)
-
-println("\n\n***********************")
-println("U")
-println("***********************")
-display(u)
-
-println("\n\n***********************")
-println("A - LU")
-println("***********************")
-
-Ps = totalPermute(p)
-
-display(Ps * A - l * u)
+end # end of module declaration

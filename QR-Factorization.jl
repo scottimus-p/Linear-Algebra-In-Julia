@@ -4,11 +4,10 @@
 # 1) Gram-Schmidt orthogonalization
 # 2) A modified version of Gram-Schmidt that's supposed to be more efficient and have less floating-point error
 # 3) QR factorization via Householder matrices
-#
-# At the end of the file is code that runs the factorizations and checks the accuracy
+
+module QrFactorization
 
 using LinearAlgebra
-
 
 function GramSchmidt(A)
 # performs a QR factorization of matrix A using the Gram-Schmidt algorithm
@@ -20,13 +19,11 @@ function GramSchmidt(A)
 
     for i = 1:cols
         tmp = A[1:rows, i:i]
-        for j = 1:(i - 1)
-            R[j:j, i:i] = transpose(Q[1:rows, j:j]) * A[1:rows, i:i]
-            tmp -= R[j:j, i:i] * Q[1:rows, j:j]
-        end
+        R[1:i, i:i] = Q[1:rows, 1:i]' * A[1:rows, i:i]
+        tmp -= Q[1:rows, 1:i] * R[1:i, i:i]
 
-        R[i:i, i:i] = VectorTwoNorm(tmp)
-        Q[1:rows, i:i] = tmp / R[i:i, i:i]
+        R[i, i] = VectorTwoNorm(tmp)
+        Q[1:rows, i:i] = tmp / R[i, i]
     end
 
     return Q, R
@@ -38,19 +35,20 @@ function ModifiedGramSchmidt(A)
 # performs a QR factorization of matrix A using a modified version of the Gram-Schmidt algorithm
 # overwrites values in A as it goes along rather than creating an additional matrix Q
 
-    M = copy(A) # I'm making a copy of A so that the original remains unchanged. It is this copy that will be overwritten
+    M = copy(A)
     rows, cols = size(M)
 
     R = zeros(cols, cols)
 
     for i = 1:cols
         for j = 1:(i - 1)
-            R[j:j, i:i] = transpose(M[1:rows, j:j]) * M[1:rows, i:i]
-            M[1:rows, i:i] -= R[j:j, i:i] * M[1:rows, j:j]
+            R[j:j, i:i] = M[1:rows, j:j]' * M[1:rows, i:i]
         end
 
-        R[i:i, i:i] = VectorTwoNorm(M[1:rows, i:i])
-        M[1:rows, i:i] = M[1:rows, i:i] / R[i:i, i:i]
+        M[1:rows, i:i] -= M[1:rows, 1:i] * R[1:i, i:i]
+
+        R[i, i] = VectorTwoNorm(M[1:rows, i:i])
+        M[1:rows, i:i] = M[1:rows, i:i] / R[i, i]
     end
 
     return M, R
@@ -58,8 +56,8 @@ end
 
 
 
-function HouseHolderQr(A)
-# performs a QR factorization of matrix A using Householders matrices
+function Householder(A)
+# performs a QR factorization of matrix A using Householder matrices
 
     R = copy(A)
     rows, cols = size(R)
@@ -134,35 +132,8 @@ end
 function StandardBasisVector(dim, i)
 # returns the i-th standard basis vector of size (dim)
 
-    return Matrix(I, dim, dim)[i:i, 1:dim]
+    return Matrix(I, dim, dim)[1:dim, i:i]
 end
 
 
-
-# Let's test out this code that we wrote
-A = [1. -1. 4.; 1. 4. -2.; 1. 4. 2.; 1. -1. 0.]
-
-println("\n\n***********************")
-println("A")
-println("***********************")
-display(A)
-
-
-# q, r = HouseHolderQr(A)
-# q, r = GramSchmidt(A)
- q, r = ModifiedGramSchmidt(A)
-
-println("\n\n***********************")
-println("Q")
-println("***********************")
-display(q)
-
-println("\n\n***********************")
-println("R")
-println("***********************")
-display(r)
-
-println("\n\n***********************")
-println("A - QR")
-println("***********************")
-display(A - q * r)
+end # end of module declaration

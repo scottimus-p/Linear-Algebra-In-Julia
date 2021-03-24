@@ -1,6 +1,6 @@
 # The code in this file performs a Cholesky factorization of a real-valued matrix.
-#
-# At the end of the file is code that runs the factorizations and checks the accuracy
+
+module CholeskyFactorization
 
 using LinearAlgebra
 
@@ -25,26 +25,4 @@ function Cholesky(A)
     return LowerTriangular(M)
 end
 
-
-
-# Let's test out this code that we wrote
-A = Matrix(Hermitian(rand(6,6) + I))
-
-println("\n\n***********************")
-println("A")
-println("***********************")
-display(A)
-
-
- l = Cholesky(A)
-
-println("\n\n***********************")
-println("L")
-println("***********************")
-display(l)
-
-println("\n\n***********************")
-println("A - LL^H")
-println("***********************")
-
-display(A - l * l')
+end # end of module declaration
