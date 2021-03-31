@@ -4,7 +4,7 @@ import .QrFactorization
 
 using LinearAlgebra
 
-A = Matrix(rand(8, 8))
+A = Matrix(rand(6, 8))
 
 println("\n\n***********************")
 println("A")
