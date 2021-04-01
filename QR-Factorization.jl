@@ -9,17 +9,21 @@ module QrFactorization
 
 using LinearAlgebra
 
+
 function GramSchmidt(A)
 # performs a QR factorization of matrix A using the Gram-Schmidt algorithm
 
-    rows, cols = size(A)
+# this algorithm only works for rows ≥ cols
+
+    M = copy(A)
+    rows, cols = size(M)
 
     Q = zeros(rows, rows)
     R = zeros(rows, cols)
 
     for i = 1:cols
-        tmp = A[1:rows, i:i]
-        R[1:i, i:i] = Q[1:rows, 1:i]' * A[1:rows, i:i]
+        tmp = M[1:rows, i:i]
+        R[1:i, i:i] = Q[1:rows, 1:i]' * M[1:rows, i:i]
         tmp -= Q[1:rows, 1:i] * R[1:i, i:i]
 
         R[i, i] = VectorTwoNorm(tmp)
@@ -34,6 +38,8 @@ end
 function ModifiedGramSchmidt(A)
 # performs a QR factorization of matrix A using a modified version of the Gram-Schmidt algorithm
 # overwrites values in A as it goes along rather than creating an additional matrix Q
+
+# this algorithm only works for rows ≥ cols
 
     M = copy(A)
     rows, cols = size(M)
