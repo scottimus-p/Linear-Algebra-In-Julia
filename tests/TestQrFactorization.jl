@@ -1,4 +1,4 @@
-include("QR-Factorization.jl")
+include("../QR-Factorization.jl")
 
 import .QrFactorization
 

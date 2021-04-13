@@ -12,35 +12,48 @@
 using LinearAlgebra
 using DelimitedFiles
 
-NumberOfIterations = 500
 
-# Set parameters for Poisson's equation
-alpha = 2
-beta = 3
+function Jacobi(Func::Function, NumberOfMeshPoints, iterations)
+# performs a Jacobi iteration to solve the system of equations
+# Func must be have two parameters
 
-NumberOfMeshPoints = 50
+    h = 1 / (NumberOfMeshPoints + 1)
 
-h = 1 / (NumberOfMeshPoints + 1)
+    x = h * collect(1:NumberOfMeshPoints + 2)
+    y = h * collect(1:NumberOfMeshPoints + 2)
 
-x = h * collect(1:NumberOfMeshPoints + 2)
-y = h * collect(1:NumberOfMeshPoints + 2)
+    F = zeros(NumberOfMeshPoints + 2, NumberOfMeshPoints + 2)
+    U = zeros(NumberOfMeshPoints + 2, NumberOfMeshPoints + 2)
 
-F = zeros(NumberOfMeshPoints + 2, NumberOfMeshPoints + 2)
-U = zeros(NumberOfMeshPoints + 2, NumberOfMeshPoints + 2)
-
-for i = 2:(NumberOfMeshPoints + 2)
-    for j = 2:(NumberOfMeshPoints + 2)
-        F[i, j] = (alpha^2 + beta^2) * pi^2 * sin(alpha * pi * x[i]) * sin(beta * pi * y[j])
-    end
-end
-
-for i = 1:NumberOfIterations
-    U_old = U
-    for j = 2:(NumberOfMeshPoints + 1)
-        for k = 2:(NumberOfMeshPoints + 1)
-            U[j, k] = (h^2 * F[j, k] + U_old[j, k - 1] + U_old[j - 1, k] + U_old[j + 1, k] + U_old[j, k + 1]) / 4
+    for i = 2:(NumberOfMeshPoints + 2)
+        for j = 2:(NumberOfMeshPoints + 2)
+            F[i, j] = Func(x[i], y[j])
         end
     end
+
+    for i = 1:NumberOfIterations
+        U_old = U
+        for j = 2:(NumberOfMeshPoints + 1)
+            for k = 2:(NumberOfMeshPoints + 1)
+                U[j, k] = (h^2 * F[j, k] + U_old[j, k - 1] + U_old[j - 1, k] + U_old[j + 1, k] + U_old[j, k + 1]) / 4
+            end
+        end
+    end
+
+    return U
 end
+
+NumberOfIterations = 500
+
+
+function PoissonEquation(x, y, α, β)
+    return (α^2 + β^2) * π^2 * sin(α * π * x) * sin(β * π * y)
+end
+
+myFunc(α, β) = function(x, y)
+    return PoissonEquation(x, y, α, β)
+end
+
+U = Jacobi(myFunc(2, 3), 50, 500)
 
 writedlm( "U.csv",  U, ',')

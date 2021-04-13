@@ -1,4 +1,4 @@
-include("Cholesky-Factorization.jl")
+include("../Cholesky-Factorization.jl")
 
 import .CholeskyFactorization
 
@@ -22,7 +22,7 @@ println("***********************")
 display(l)
 
 println("\n\n***********************")
-println("A - LL^H")
+println("A - LLᵀ")
 println("***********************")
 
 display(A - l * l')
@@ -37,7 +37,7 @@ println("***********************")
 display(l)
 
 println("\n\n***********************")
-println("A - LL^H")
+println("A - LLᵀ")
 println("***********************")
 
 display(A - l * l')

@@ -1,4 +1,4 @@
-include("LU-Factorization.jl")
+include("../LU-Factorization.jl")
 
 import .LuFactorization
 
@@ -66,7 +66,7 @@ println("***********************")
 display(u)
 
 println("\n\n***********************")
-println("A - LU")
+println("PA - LU")
 println("***********************")
 
 for i = 1:size(A)[2]
@@ -90,7 +90,7 @@ println("***********************")
 display(u)
 
 println("\n\n***********************")
-println("A - LU")
+println("PA - LU")
 println("***********************")
 
 display(p * A - l * u)
