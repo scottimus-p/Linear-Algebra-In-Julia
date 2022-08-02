@@ -28,7 +28,7 @@ function FrancisStep(T)
     G = GivensRotation(T[1, 1] - T[rows, rows]
                         T[2, 1])
 
-    # cmopute the updates to the matrix using only the lower triangular
+    # compute the updates to the matrix using only the lower triangular
     # entries, but first also computing the one entry that is above the
     # diagonal, resulting in a temporary matrix S
     S = [G' * [ T[1, 1], T[2, 1]
